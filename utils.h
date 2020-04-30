@@ -208,6 +208,31 @@ static inline int is_url(const char *name)
 	return is_http_url(name) || is_cdda_url(name) || is_cue_url(name);
 }
 
+static inline char *get_artwork(const char *filepath)
+{
+    char *pos = strrchr(filepath, '/');
+    if (pos == NULL) {
+        return NULL;
+    }
+
+    long len = pos - filepath + 1;
+    char *coverpath = malloc(len + 10);
+    snprintf(coverpath, len + 1, "%s", filepath);
+
+    snprintf(coverpath + len, 10, "cover.jpg");
+    if (access(coverpath, F_OK) != -1 ) {
+        return coverpath;
+    }
+
+    snprintf(coverpath + len + 6, 4, "png");
+    if (access(coverpath, F_OK) != -1 ) {
+        return coverpath;
+    }
+
+    free(coverpath);
+    return NULL;
+}
+
 static inline int is_freeform_true(const char *c)
 {
 	return	c[0] == '1' ||
